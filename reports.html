@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      h1 {
+        text-align: center;
+        font-size: 2rem;
+      }
+      p {
+        padding: 20px 10px;
+        text-align: center;
+        font-size: 1.2rem;
+        line-height: 2;
+      }
+    </style>
+  </head>
+  <body>
+    <button id="toHome">조회화면으로..</button>
+    <h1>Reports Result</h1>
+    <p id="section__results"></p>
+
+    <script>
+      const $toHome = document.getElementById("toHome");
+      $toHome.addEventListener("click", () => {
+        window.location.href = "index.html";
+      });
+
+      const $sectionResults = document.getElementById("section__results");
+
+      async function rendering() {
+        fetch("https://my-main-server.herokuapp.com/calculate", {
+          method: "GET",
+        })
+          .then((response) => response.json())
+          .then((json) => {
+            const report = json.result[json.result.length - 1];
+            const {
+              day,
+              inCount,
+              outCount,
+              totalWeight,
+              feedAmount,
+              averageWeight,
+              feedEfficiency,
+              productionIndex,
+              upbringingRate,
+            } = report;
+
+            const containerNode = document.createElement("div");
+
+            function transValue(value, float) {
+              return parseFloat(value.toFixed(float)).toLocaleString("ko-KR");
+            }
+
+            const node1 = document.createElement("div");
+            const textNode1 = document.createTextNode(
+              `사육일수:  ${transValue(day, 1)}일`
+            );
+            const node2 = document.createElement("div");
+            const textNode2 = document.createTextNode(
+              `입추수수:  ${transValue(inCount, 0)}수`
+            );
+            const node3 = document.createElement("div");
+            const textNode3 = document.createTextNode(
+              `출하수수:  ${transValue(outCount, 0)}수`
+            );
+            const node4 = document.createElement("div");
+            const textNode4 = document.createTextNode(
+              `평균중량:  ${transValue(averageWeight, 3)}kg`
+            );
+            const node5 = document.createElement("div");
+            const textNode5 = document.createTextNode(
+              `총 중량:  ${transValue(totalWeight, 1)}kg`
+            );
+            const node6 = document.createElement("div");
+            const textNode6 = document.createTextNode(
+              `총사료량:  ${transValue(feedAmount, 2)}kg`
+            );
+            const node7 = document.createElement("div");
+            const textNode7 = document.createTextNode(
+              `육성율:  ${transValue(upbringingRate, 1)}%`
+            );
+            const node8 = document.createElement("div");
+            const textNode8 = document.createTextNode(
+              `사료요구율:  ${transValue(feedEfficiency, 3)}`
+            );
+            const node9 = document.createElement("div");
+            const textNode9 = document.createTextNode(
+              `생산지수:  ${transValue(productionIndex, 2)}`
+            );
+
+            node1.appendChild(textNode1);
+            node2.appendChild(textNode2);
+            node3.appendChild(textNode3);
+            node4.appendChild(textNode4);
+            node5.appendChild(textNode5);
+            node6.appendChild(textNode6);
+            node7.appendChild(textNode7);
+            node8.appendChild(textNode8);
+            node9.appendChild(textNode9);
+
+            containerNode.append(
+              node1,
+              node2,
+              node3,
+              node4,
+              node5,
+              node6,
+              node7,
+              node8,
+              node9
+            );
+
+            $sectionResults.appendChild(containerNode);
+          })
+          .catch((err) => console.error(err));
+      }
+      // async function rendering() {
+      //   await fetch("https://my-main-server.herokuapp.com/calculate", {
+      //     method: "GET",
+      //   })
+      //     .then((response) => response.json())
+      //     .then((json) => {
+      //       console.log(json);
+      //       for (let i = 0; i < json.result.length; i++) {
+      //         const motherNode = document.createElement("div");
+      //         const motherTextNode = document.createTextNode(
+      //           `[ Data ${i + 1} ]`
+      //         );
+      //         const middleNode = document.createElement("br");
+      //         const childNode = document.createElement("div");
+      //         const node1 = document.createElement("div");
+      //         const textNode1 = document.createTextNode(
+      //           json.result[i].averageWeight
+      //         );
+      //         const node2 = document.createElement("div");
+      //         const textNode2 = document.createTextNode(json.result[i].day);
+      //         const node3 = document.createElement("div");
+      //         const textNode3 = document.createTextNode(
+      //           json.result[i].feedAmount
+      //         );
+      //         const node4 = document.createElement("div");
+      //         const textNode4 = document.createTextNode(
+      //           json.result[i].feedEfficiency
+      //         );
+      //         const node5 = document.createElement("div");
+      //         const textNode5 = document.createTextNode(json.result[i].inCount);
+      //         const node6 = document.createElement("div");
+      //         const textNode6 = document.createTextNode(
+      //           json.result[i].outCount
+      //         );
+      //         const node7 = document.createElement("div");
+      //         const textNode7 = document.createTextNode(
+      //           json.result[i].productionIndex
+      //         );
+      //         const node8 = document.createElement("div");
+      //         const textNode8 = document.createTextNode(
+      //           json.result[i].totalWeight
+      //         );
+      //         const node9 = document.createElement("div");
+      //         const textNode9 = document.createTextNode(
+      //           json.result[i].upbringingRate
+      //         );
+      //         motherNode.appendChild(middleNode);
+      //         motherNode.appendChild(motherTextNode);
+
+      //         node1.appendChild(textNode1);
+      //         node2.appendChild(textNode2);
+      //         node3.appendChild(textNode3);
+      //         node4.appendChild(textNode4);
+      //         node5.appendChild(textNode5);
+      //         node6.appendChild(textNode6);
+      //         node7.appendChild(textNode7);
+      //         node8.appendChild(textNode8);
+      //         node9.appendChild(textNode9);
+
+      //         childNode.append(
+      //           node1,
+      //           node2,
+      //           node3,
+      //           node4,
+      //           node5,
+      //           node6,
+      //           node7,
+      //           node8,
+      //           node9
+      //         );
+      //         motherNode.appendChild(childNode);
+
+      //         $sectionResults.appendChild(motherNode);
+      //       }
+      //     })
+      //     .catch((error) => console.error(error));
+      // }
+      rendering();
+    </script>
+  </body>
+</html>

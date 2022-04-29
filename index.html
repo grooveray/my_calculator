@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Calculator</title>
+    <style>
+      body {
+        padding: 20px;
+        border: 1px solid #000;
+        border-radius: 15px;
+      }
+      .main-title {
+        text-align: center;
+        padding: 5px 5px;
+        margin-bottom: 4rem;
+        background-color: #e6ff5a;
+        border-radius: 10px;
+      }
+      .main-body {
+        padding: 10px 0;
+      }
+      #input-section {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+      }
+      #input-section label {
+        text-align: left;
+        padding-left: 10px;
+        font-weight: 700;
+      }
+      #input-section input {
+        display: block;
+        margin-top: 2px;
+        margin-bottom: 1.8rem;
+        width: 50%;
+        height: 1.5rem;
+      }
+      #submit {
+        max-width: 20%;
+      }
+      input#submit {
+        outline: none;
+        background-color: #3d4aff;
+        border: 1px solid rgb(2, 0, 138);
+        border-radius: 5px;
+        height: 2rem;
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: #fff;
+        box-shadow: 3px 3px 2px #888;
+      }
+      input#submit:hover {
+        outline: none;
+        background-color: #fff;
+        border: 1px solid #3d4aff;
+        border-radius: 5px;
+        height: 2rem;
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: #3d4aff;
+        box-shadow: inset 3px 3px 2px #888;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="main-title">
+      <h1>Calculrator</h1>
+    </div>
+    <div class="main-body">
+      <form id="input-section">
+        <label>사육일수 (일)</label>
+        <input name="day" type="number" id="day" />
+        <label>입추수수 (수)</label>
+        <input name="in-count" id="in-count" />
+        <label>출하수수 (수)</label>
+        <input name="out-count" id="out-count" />
+        <label>출하 총중량 (kg)</label>
+        <input name="total-weight" id="total-weight" />
+        <label>총 사료량 (kg)</label>
+        <input name="feed-amount" id="feed-amount" />
+        <input type="submit" id="submit" value="계산하기" />
+      </form>
+      <div id="view-section"></div>
+      <div id="result-section"></div>
+    </div>
+    <script>
+      const $day = document.getElementById("day");
+      const $inCount = document.getElementById("inCount");
+      const $outCount = document.getElementById("outCount");
+      const $totalWeight = document.getElementById("totalWeight");
+      const $feedAmount = document.getElementById("feedAmount");
+      const $submit = document.getElementById("submit");
+
+      const $inputSection = document.getElementById("input-section");
+      const $viewSection = document.getElementById("view-section");
+      const $resultSection = document.getElementById("result-section");
+
+      // let day, inCount, outCount, totalWeight, feedAmount
+
+      // function onChange (e) {
+      //   day = parseInt(e.target[0].value);
+      //   inCount = parseInt(e.target[1].value);
+      //   outCount = parseInt(e.target[2].value);
+      //   totalWeight = parseInt(e.target[3].value);
+      //   feedAmount = parseInt(e.target[4].value);
+      //   console.log(day, inCount, outCount, totalWeight, feedAmount)
+      // }
+      $inputSection.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        // for (let i = 0; i < 5; i++) {
+        //   const node = document.createElement('div');
+        //   const textNode = document.createTextNode(e.target[i].value);
+        //   node.appendChild(textNode);
+        //   $viewSection.appendChild(node);
+        // }
+        // e.target.map(input => $viewSection.innerHTML = `<div>${input.value}</div>`)
+        const day = parseInt(e.target[0].value);
+        const inCount = parseInt(e.target[1].value);
+        const outCount = parseInt(e.target[2].value);
+        const totalWeight = parseInt(e.target[3].value);
+        const feedAmount = parseInt(e.target[4].value);
+
+        console.log(day, inCount, outCount, totalWeight, feedAmount);
+
+        fetch("https://my-main-server.herokuapp.com/calculate", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            day,
+            inCount,
+            outCount,
+            totalWeight,
+            feedAmount,
+          }),
+        })
+          .then(() => {
+            window.location.href = "reports.html";
+          })
+          .catch((err) => console.error(err));
+        // .then(response => response.json()).then(json => console.log(json)).catch(err => console.error(err))
+      });
+    </script>
+  </body>
+</html>
