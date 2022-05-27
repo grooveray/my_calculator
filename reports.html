@@ -32,7 +32,7 @@
       const $sectionResults = document.getElementById("section__results");
 
       async function rendering() {
-        fetch("https://my-main-server.herokuapp.com/calculate", {
+        fetch("https://ray-calculator.herokuapp.com/calculate", {
           method: "GET",
         })
           .then((response) => response.json())
@@ -120,7 +120,7 @@
           .catch((err) => console.error(err));
       }
       // async function rendering() {
-      //   await fetch("https://my-main-server.herokuapp.com/calculate", {
+      //   await fetch("https://ray-calculator.herokuapp.com/calculate", {
       //     method: "GET",
       //   })
       //     .then((response) => response.json())
