@@ -23,6 +23,7 @@
       let reports = [];
 
       function transValue(value, floatNumber) {
+        if (!value) return 0;
         return parseFloat(value.toFixed(floatNumber)).toLocaleString("ko-KR");
       }
       function onClick(index) {
@@ -64,8 +65,8 @@
               const node = document.createElement("div");
               const textNode = document.createTextNode(
                 `D:${day},
-                IN:${transValue(inCount, 0)}수,
-                OUT:${transValue(outCount, 0)}수,
+                IN:${inCount}수,
+                OUT:${outCount}수,
                 AW:${transValue(averageWeight, 3)}kg,
                 TW:${transValue(totalWeight, 1)}kg, 
                 FA:${transValue(feedAmount, 2)}kg,
