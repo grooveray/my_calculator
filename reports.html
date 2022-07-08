@@ -6,24 +6,50 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Document</title>
     <style>
-      h1 {
-        text-align: center;
-        font-size: 2rem;
+      body {
+        font-size: 1.5rem;
       }
-      p {
+      .main-title {
+        text-align: center;
+        font-size: 3.5rem;
+        margin: 5px 0;
+      }
+      #section__results {
         padding: 20px 10px;
         text-align: center;
-        font-size: 1.2rem;
         line-height: 2;
+      }
+      #toHome {
+        width: 11rem;
+        outline: none;
+        background-color: #1ad05c;
+        border: 1px solid rgb(0, 138, 5);
+        border-radius: 5px;
+        height: 1.7rem;
+        font-size: 1rem;
+        font-weight: 700;
+        color: #333;
+        box-shadow: 3px 3px 2px #888, inset 2px 2px 2px rgba(255, 255, 255, 0.4);
+      }
+      #toHome:hover {
+        box-shadow: inset 3px 3px 2px #888;
+      }
+      #section__results div div {
+        margin-bottom: 10px;
+        background: #eee;
       }
     </style>
   </head>
   <body>
     <button id="toHome">조회화면으로..</button>
-    <h1>Reports Result</h1>
-    <p id="section__results"></p>
+    <div>
+      <h1 class="main-title">Reports Result</h1>
+    </div>
+    <div id="section__results"></div>
 
     <script>
+      // const baseUrl = "https://ray-calculator.herokuapp.com";
+      const baseUrl = "http://localhost:8080";
       const $toHome = document.getElementById("toHome");
       $toHome.addEventListener("click", () => {
         window.location.href = "index.html";
@@ -32,12 +58,12 @@
       const $sectionResults = document.getElementById("section__results");
 
       async function rendering() {
-        fetch("https://ray-calculator.herokuapp.com/calculate", {
+        fetch(`${baseUrl}/calculate`, {
           method: "GET",
         })
           .then((response) => response.json())
           .then((json) => {
-            const report = json.result[json.result.length - 1];
+            const report = json.data[json.data.length - 1];
             const {
               day,
               inCount,
@@ -52,45 +78,47 @@
 
             const containerNode = document.createElement("div");
 
-            function transValue(value, float) {
-              return parseFloat(value.toFixed(float)).toLocaleString("ko-KR");
+            function transValue(value, floatNumber) {
+              return parseFloat(value.toFixed(floatNumber)).toLocaleString(
+                "ko-KR"
+              );
             }
 
             const node1 = document.createElement("div");
             const textNode1 = document.createTextNode(
-              `사육일수:  ${transValue(day, 1)}일`
+              `사육일수 :  ${transValue(day, 1)}일`
             );
             const node2 = document.createElement("div");
             const textNode2 = document.createTextNode(
-              `입추수수:  ${transValue(inCount, 0)}수`
+              `입추수수 :  ${transValue(inCount, 0)}수`
             );
             const node3 = document.createElement("div");
             const textNode3 = document.createTextNode(
-              `출하수수:  ${transValue(outCount, 0)}수`
+              `출하수수 :  ${transValue(outCount, 0)}수`
             );
             const node4 = document.createElement("div");
             const textNode4 = document.createTextNode(
-              `평균중량:  ${transValue(averageWeight, 3)}kg`
+              `평균중량 :  ${transValue(averageWeight, 3)}kg`
             );
             const node5 = document.createElement("div");
             const textNode5 = document.createTextNode(
-              `총 중량:  ${transValue(totalWeight, 1)}kg`
+              `총 중량 :  ${transValue(totalWeight, 1)}kg`
             );
             const node6 = document.createElement("div");
             const textNode6 = document.createTextNode(
-              `총사료량:  ${transValue(feedAmount, 2)}kg`
+              `총사료량 :  ${transValue(feedAmount, 2)}kg`
             );
             const node7 = document.createElement("div");
             const textNode7 = document.createTextNode(
-              `육성율:  ${transValue(upbringingRate, 1)}%`
+              `육성율 :  ${transValue(upbringingRate, 1)}%`
             );
             const node8 = document.createElement("div");
             const textNode8 = document.createTextNode(
-              `사료요구율:  ${transValue(feedEfficiency, 3)}`
+              `사료요구율 :  ${transValue(feedEfficiency, 3)}`
             );
             const node9 = document.createElement("div");
             const textNode9 = document.createTextNode(
-              `생산지수:  ${transValue(productionIndex, 2)}`
+              `생산지수 :  ${transValue(productionIndex, 2)}`
             );
 
             node1.appendChild(textNode1);
@@ -119,83 +147,6 @@
           })
           .catch((err) => console.error(err));
       }
-      // async function rendering() {
-      //   await fetch("https://ray-calculator.herokuapp.com/calculate", {
-      //     method: "GET",
-      //   })
-      //     .then((response) => response.json())
-      //     .then((json) => {
-      //       console.log(json);
-      //       for (let i = 0; i < json.result.length; i++) {
-      //         const motherNode = document.createElement("div");
-      //         const motherTextNode = document.createTextNode(
-      //           `[ Data ${i + 1} ]`
-      //         );
-      //         const middleNode = document.createElement("br");
-      //         const childNode = document.createElement("div");
-      //         const node1 = document.createElement("div");
-      //         const textNode1 = document.createTextNode(
-      //           json.result[i].averageWeight
-      //         );
-      //         const node2 = document.createElement("div");
-      //         const textNode2 = document.createTextNode(json.result[i].day);
-      //         const node3 = document.createElement("div");
-      //         const textNode3 = document.createTextNode(
-      //           json.result[i].feedAmount
-      //         );
-      //         const node4 = document.createElement("div");
-      //         const textNode4 = document.createTextNode(
-      //           json.result[i].feedEfficiency
-      //         );
-      //         const node5 = document.createElement("div");
-      //         const textNode5 = document.createTextNode(json.result[i].inCount);
-      //         const node6 = document.createElement("div");
-      //         const textNode6 = document.createTextNode(
-      //           json.result[i].outCount
-      //         );
-      //         const node7 = document.createElement("div");
-      //         const textNode7 = document.createTextNode(
-      //           json.result[i].productionIndex
-      //         );
-      //         const node8 = document.createElement("div");
-      //         const textNode8 = document.createTextNode(
-      //           json.result[i].totalWeight
-      //         );
-      //         const node9 = document.createElement("div");
-      //         const textNode9 = document.createTextNode(
-      //           json.result[i].upbringingRate
-      //         );
-      //         motherNode.appendChild(middleNode);
-      //         motherNode.appendChild(motherTextNode);
-
-      //         node1.appendChild(textNode1);
-      //         node2.appendChild(textNode2);
-      //         node3.appendChild(textNode3);
-      //         node4.appendChild(textNode4);
-      //         node5.appendChild(textNode5);
-      //         node6.appendChild(textNode6);
-      //         node7.appendChild(textNode7);
-      //         node8.appendChild(textNode8);
-      //         node9.appendChild(textNode9);
-
-      //         childNode.append(
-      //           node1,
-      //           node2,
-      //           node3,
-      //           node4,
-      //           node5,
-      //           node6,
-      //           node7,
-      //           node8,
-      //           node9
-      //         );
-      //         motherNode.appendChild(childNode);
-
-      //         $sectionResults.appendChild(motherNode);
-      //       }
-      //     })
-      //     .catch((error) => console.error(error));
-      // }
       rendering();
     </script>
   </body>

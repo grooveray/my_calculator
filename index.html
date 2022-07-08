@@ -10,13 +10,23 @@
         padding: 20px;
         border: 1px solid #000;
         border-radius: 15px;
+        font-size: 1.5rem;
       }
-      .main-title {
+      .main-head {
         text-align: center;
-        padding: 5px 5px;
-        margin-bottom: 4rem;
+        margin-bottom: 1rem;
         background-color: #e6ff5a;
         border-radius: 10px;
+        padding: 0.5rem 0;
+      }
+      .main-title {
+        font-size: 3.5rem;
+        margin: 2px 0;
+      }
+      .main-footer {
+        text-align: right;
+        font-size: 0.7rem;
+        padding-right: 8px;
       }
       .main-body {
         padding: 10px 0;
@@ -34,32 +44,33 @@
       }
       #input-section input {
         display: block;
-        margin-top: 2px;
-        margin-bottom: 1.8rem;
+        margin-top: 0.5px;
+        margin-bottom: 1.2rem;
         width: 50%;
-        height: 1.5rem;
-      }
-      #submit {
-        max-width: 20%;
+        height: 1.7rem;
+        border: 1px solid #333;
+        border-radius: 5px;
+        box-shadow: inset 2px 2px 4px rgba(0, 0, 0, 0.2);
       }
       input#submit {
+        width: 8rem;
         outline: none;
         background-color: #3d4aff;
         border: 1px solid rgb(2, 0, 138);
         border-radius: 5px;
-        height: 2rem;
-        font-size: 1.2rem;
+        height: 2.5rem;
+        font-size: 1.8rem;
         font-weight: 700;
         color: #fff;
-        box-shadow: 3px 3px 2px #888;
+        box-shadow: 3px 3px 2px #888, inset 2px 2px 2px rgba(255, 255, 255, 0.4);
       }
       input#submit:hover {
         outline: none;
         background-color: #fff;
         border: 1px solid #3d4aff;
         border-radius: 5px;
-        height: 2rem;
-        font-size: 1.2rem;
+        height: 2.5rem;
+        font-size: 1.8rem;
         font-weight: 700;
         color: #3d4aff;
         box-shadow: inset 3px 3px 2px #888;
@@ -67,27 +78,33 @@
     </style>
   </head>
   <body>
-    <div class="main-title">
-      <h1>Calculrator</h1>
+    <div class="main-head">
+      <h1 class="main-title">Calculrator</h1>
+      <div class="main-footer">
+        <span>개발자: 김민홍</span> <span>(010-3088-3420)</span>
+      </div>
     </div>
     <div class="main-body">
       <form id="input-section">
         <label>사육일수 (일)</label>
-        <input name="day" type="number" id="day" />
+        <input name="day" type="number" step="0.1" id="day" />
         <label>입추수수 (수)</label>
-        <input name="in-count" id="in-count" />
+        <input name="in-count" type="number" step="0.1" id="in-count" />
         <label>출하수수 (수)</label>
-        <input name="out-count" id="out-count" />
+        <input name="out-count" type="number" step="0.1" id="out-count" />
         <label>출하 총중량 (kg)</label>
-        <input name="total-weight" id="total-weight" />
+        <input name="total-weight" type="number" step="0.1" id="total-weight" />
         <label>총 사료량 (kg)</label>
-        <input name="feed-amount" id="feed-amount" />
+        <input name="feed-amount" type="number" step="0.1" id="feed-amount" />
         <input type="submit" id="submit" value="계산하기" />
       </form>
       <div id="view-section"></div>
       <div id="result-section"></div>
     </div>
     <script>
+      // const baseUrl = "https://ray-calculator.herokuapp.com";
+      const baseUrl = "http://localhost:8080";
+
       const $day = document.getElementById("day");
       const $inCount = document.getElementById("inCount");
       const $outCount = document.getElementById("outCount");
@@ -99,34 +116,16 @@
       const $viewSection = document.getElementById("view-section");
       const $resultSection = document.getElementById("result-section");
 
-      // let day, inCount, outCount, totalWeight, feedAmount
-
-      // function onChange (e) {
-      //   day = parseInt(e.target[0].value);
-      //   inCount = parseInt(e.target[1].value);
-      //   outCount = parseInt(e.target[2].value);
-      //   totalWeight = parseInt(e.target[3].value);
-      //   feedAmount = parseInt(e.target[4].value);
-      //   console.log(day, inCount, outCount, totalWeight, feedAmount)
-      // }
       $inputSection.addEventListener("submit", async (e) => {
         e.preventDefault();
-        // for (let i = 0; i < 5; i++) {
-        //   const node = document.createElement('div');
-        //   const textNode = document.createTextNode(e.target[i].value);
-        //   node.appendChild(textNode);
-        //   $viewSection.appendChild(node);
-        // }
-        // e.target.map(input => $viewSection.innerHTML = `<div>${input.value}</div>`)
-        const day = parseInt(e.target[0].value);
-        const inCount = parseInt(e.target[1].value);
-        const outCount = parseInt(e.target[2].value);
-        const totalWeight = parseInt(e.target[3].value);
-        const feedAmount = parseInt(e.target[4].value);
 
-        console.log(day, inCount, outCount, totalWeight, feedAmount);
+        const day = parseFloat(e.target[0].value);
+        const inCount = parseFloat(e.target[1].value);
+        const outCount = parseFloat(e.target[2].value);
+        const totalWeight = parseFloat(e.target[3].value);
+        const feedAmount = parseFloat(e.target[4].value);
 
-        fetch("https://ray-calculator.herokuapp.com/calculate", {
+        fetch(`${baseUrl}/calculate`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
