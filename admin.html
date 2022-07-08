@@ -64,7 +64,7 @@
               } = reports[i];
               const node = document.createElement("div");
               const textNode = document.createTextNode(
-                `D:${day},
+                `D:${transValue(day, 1)},
                 IN:${inCount}수,
                 OUT:${outCount}수,
                 AW:${transValue(averageWeight, 3)}kg,
