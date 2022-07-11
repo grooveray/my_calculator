@@ -86,6 +86,22 @@
     </div>
     <div class="main-body">
       <form id="input-section">
+        <select name="company" id="company">
+          <option value="" selected disabled hidden>
+            사료회사명을 선택해주세요
+          </option>
+          <option value="suwon">수원</option>
+          <option value="yangju">양주</option>
+          <option value="anyang">안양</option>
+          <option value="bucheon">미래부</option>
+          <option value="seobu">서부</option>
+          <option value="jeil">천하제일</option>
+          <option value="jungang">중앙</option>
+          <option value="woosung">우성</option>
+          <option value="donga">동아</option>
+          <option value="rainbow">무지개</option>
+          <option value="etc">기타</option>
+        </select>
         <label>사육일수 (일)</label>
         <input name="day" type="number" step="0.1" id="day" />
         <label>입추수수 (수)</label>
@@ -105,6 +121,7 @@
       const baseUrl = "https://ray-calculator.herokuapp.com";
       // const baseUrl = "http://localhost:8080";
 
+      const $company = document.getElementById("company");
       const $day = document.getElementById("day");
       const $inCount = document.getElementById("inCount");
       const $outCount = document.getElementById("outCount");
@@ -119,11 +136,12 @@
       $inputSection.addEventListener("submit", async (e) => {
         e.preventDefault();
 
-        const day = parseFloat(e.target[0].value);
-        const inCount = parseFloat(e.target[1].value);
-        const outCount = parseFloat(e.target[2].value);
-        const totalWeight = parseFloat(e.target[3].value);
-        const feedAmount = parseFloat(e.target[4].value);
+        const company = e.target[0].value;
+        const day = parseFloat(e.target[1].value);
+        const inCount = parseFloat(e.target[2].value);
+        const outCount = parseFloat(e.target[3].value);
+        const totalWeight = parseFloat(e.target[4].value);
+        const feedAmount = parseFloat(e.target[5].value);
 
         fetch(`${baseUrl}/calculate`, {
           method: "POST",
@@ -131,6 +149,7 @@
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
+            company,
             day,
             inCount,
             outCount,
