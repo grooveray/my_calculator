@@ -50,8 +50,9 @@
             reports = json.data;
             const containerNode = document.createElement("div");
 
-            for (let i = 0; i < reports.length; i++) {
+            for (let i = reports.length - 1; i >= 0; i--) {
               const {
+                company,
                 day,
                 inCount,
                 outCount,
@@ -64,7 +65,8 @@
               } = reports[i];
               const node = document.createElement("div");
               const textNode = document.createTextNode(
-                `D:${transValue(day, 1)},
+                `C:${company},
+                D:${transValue(day, 1)},
                 IN:${inCount}수,
                 OUT:${outCount}수,
                 AW:${transValue(averageWeight, 3)}kg,
@@ -85,83 +87,6 @@
             }
 
             $sectionAdmin.append(containerNode);
-            // for (let i = 0; i < reports.length; i++) {
-            //   const {
-            //     day,
-            //     inCount,
-            //     outCount,
-            //     totalWeight,
-            //     feedAmount,
-            //     averageWeight,
-            //     feedEfficiency,
-            //     productionIndex,
-            //     upbringingRate,
-            //   } = reports[i];
-
-            //   const containerNode = document.createElement("div");
-
-            //   const node1 = document.createElement("div");
-            //   const textNode1 = document.createTextNode(
-            //     `사육일수 :  ${transValue(day, 1)}일`
-            //   );
-
-            //   const node2 = document.createElement("div");
-            //   const textNode2 = document.createTextNode(
-            //     `입추수수 :  ${transValue(inCount, 0)}수`
-            //   );
-            //   const node3 = document.createElement("div");
-            //   const textNode3 = document.createTextNode(
-            //     `출하수수 :  ${transValue(outCount, 0)}수`
-            //   );
-            //   const node4 = document.createElement("div");
-            //   const textNode4 = document.createTextNode(
-            //     `평균중량 :  ${transValue(averageWeight, 3)}kg`
-            //   );
-            //   const node5 = document.createElement("div");
-            //   const textNode5 = document.createTextNode(
-            //     `총 중량 :  ${transValue(totalWeight, 1)}kg`
-            //   );
-            //   const node6 = document.createElement("div");
-            //   const textNode6 = document.createTextNode(
-            //     `총사료량 :  ${transValue(feedAmount, 2)}kg`
-            //   );
-            //   const node7 = document.createElement("div");
-            //   const textNode7 = document.createTextNode(
-            //     `육성율 :  ${transValue(upbringingRate, 1)}%`
-            //   );
-            //   const node8 = document.createElement("div");
-            //   const textNode8 = document.createTextNode(
-            //     `사료요구율 :  ${transValue(feedEfficiency, 3)}`
-            //   );
-            //   const node9 = document.createElement("div");
-            //   const textNode9 = document.createTextNode(
-            //     `생산지수 :  ${transValue(productionIndex, 2)}`
-            //   );
-
-            //   node1.appendChild(textNode1);
-            //   node2.appendChild(textNode2);
-            //   node3.appendChild(textNode3);
-            //   node4.appendChild(textNode4);
-            //   node5.appendChild(textNode5);
-            //   node6.appendChild(textNode6);
-            //   node7.appendChild(textNode7);
-            //   node8.appendChild(textNode8);
-            //   node9.appendChild(textNode9);
-
-            //   containerNode.append(
-            //     node1,
-            //     node2,
-            //     node3,
-            //     node4,
-            //     node5,
-            //     node6,
-            //     node7,
-            //     node8,
-            //     node9
-            //   );
-
-            //   $sectionAdmin.appendChild(containerNode);
-            // }
           })
           .catch((err) => console.error(err));
       }
