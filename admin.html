@@ -12,6 +12,19 @@
     </style>
   </head>
   <body>
+    <div id="'section__filter">
+      <select name="filter" id="select-filter">
+        <option value="" selected disabled hidden>Data filtering..</option>
+        <option value="all">all</option>
+        <option value="company">company</option>
+        <option value="feedEfficiency">feedEfficiency</option>
+        <option value="day">day</option>
+        <option value="productionIndex">productionIndex</option>
+        <option value="averageWeight">averageWeight</option>
+        <option value="createdAt">createdAt</option>
+        <option value="updatedAt">updatedAt</option>
+      </select>
+    </div>
     <div id="section__admin"></div>
 
     <script>
@@ -19,14 +32,24 @@
       // const baseUrl = "http://localhost:8080";
 
       let $sectionAdmin = document.getElementById("section__admin");
+      const $sectionFilter = document.getElementById("section__filter");
+      const $selectFilter = document.getElementById("select-filter");
 
       let reports = [];
+
+      function transDateStr(string) {
+        if (!string) return "-";
+        const year = string.substr(0, 4);
+        const month = string.substr(5, 2);
+        const date = string.substr(8, 2);
+        return `${year}/${month}/${date}`;
+      }
 
       function transValue(value, floatNumber) {
         if (!value) return 0;
         return parseFloat(value.toFixed(floatNumber)).toLocaleString("ko-KR");
       }
-      function onClick(index) {
+      async function onClick(index) {
         const id = reports[index].id;
         const isCorrect = prompt("Enter Something", 0);
         if (isCorrect !== "012486")
@@ -40,7 +63,11 @@
           })
           .catch(console.error);
       }
-
+      $selectFilter.addEventListener("change", (event) => {
+        const selectValue = event.target.value;
+        console.log(selectValue);
+        // 여기서 중단됨
+      });
       async function rendering() {
         fetch(`${baseUrl}/calculate`, {
           method: "GET",
@@ -48,9 +75,10 @@
           .then((response) => response.json())
           .then((json) => {
             reports = json.data;
+            console.log(reports);
             const containerNode = document.createElement("div");
 
-            for (let i = reports.length - 1; i >= 0; i--) {
+            for (let i = 0; i < reports.length; i++) {
               const {
                 company,
                 day,
@@ -62,6 +90,8 @@
                 upbringingRate,
                 feedEfficiency,
                 productionIndex,
+                createdAt,
+                updatedAt,
               } = reports[i];
               const node = document.createElement("div");
               const textNode = document.createTextNode(
@@ -74,7 +104,9 @@
                 FA:${transValue(feedAmount, 2)}kg,
                 UR:${transValue(upbringingRate, 1)}%,
                 FE:${transValue(feedEfficiency, 3)},
-                PI:${transValue(productionIndex, 2)}`
+                PI:${transValue(productionIndex, 2)},
+                CR:${transDateStr(createdAt)},
+                UP:${transDateStr(updatedAt)}`
               );
               node.appendChild(textNode);
 
