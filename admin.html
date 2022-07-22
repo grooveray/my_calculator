@@ -91,13 +91,13 @@
           headNode.appendChild(dataNode);
         }
         if (tagName === "td") {
-          const btnNode = document.createElement("input");
-          btnNode.setAttribute("type", "button");
-          btnNode.setAttribute("value", "Delete");
           if (reportsIndex || reportsIndex === 0) {
+            const btnNode = document.createElement("input");
+            btnNode.setAttribute("type", "button");
+            btnNode.setAttribute("value", "Delete");
             btnNode.setAttribute("onclick", `onClick(${reportsIndex})`);
+            headNode.appendChild(btnNode);
           }
-          headNode.appendChild(btnNode);
         }
         return headNode;
       }
