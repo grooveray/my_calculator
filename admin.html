@@ -173,7 +173,11 @@
                 transDateStr(createdAt),
                 transDateStr(updatedAt),
               ];
-              if (company === selectValue || selectValue === "all") {
+              if (
+                company === selectValue ||
+                selectValue === "all" ||
+                !selectValue
+              ) {
                 const dataLineNode = returnTrGroup("td", firstTextArray, i);
                 containerNode.appendChild(dataLineNode);
                 nextId += 1;
