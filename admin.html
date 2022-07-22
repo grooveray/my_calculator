@@ -9,20 +9,46 @@
       #section__admin div div {
         border-top: 1px solid red;
       }
+      table {
+        width: 100%;
+        border: 1px solid #000;
+        border-collapse: collapse;
+      }
+      th,
+      td {
+        border: 1px solid #000;
+        padding: 8px 4px;
+      }
+      input {
+        width: 100%;
+        padding: 5px 1px;
+        margin-top: 3px;
+      }
+      #section__filter {
+        margin-bottom: 20px;
+      }
+      #section__filter select {
+        padding: 5px 10px;
+        font-size: 1rem;
+      }
     </style>
   </head>
   <body>
-    <div id="'section__filter">
+    <div id="section__filter">
       <select name="filter" id="select-filter">
         <option value="" selected disabled hidden>Data filtering..</option>
-        <option value="all">all</option>
-        <option value="company">company</option>
-        <option value="feedEfficiency">feedEfficiency</option>
-        <option value="day">day</option>
-        <option value="productionIndex">productionIndex</option>
-        <option value="averageWeight">averageWeight</option>
-        <option value="createdAt">createdAt</option>
-        <option value="updatedAt">updatedAt</option>
+        <option value="all">모두보이기</option>
+        <option value="suwon">수원</option>
+        <option value="yangju">양주</option>
+        <option value="anyang">안양</option>
+        <option value="bucheon">미래부</option>
+        <option value="seobu">서부</option>
+        <option value="jeil">천하제일</option>
+        <option value="jungang">중앙</option>
+        <option value="woosung">우성</option>
+        <option value="donga">동아사조원</option>
+        <option value="rainbow">무지개</option>
+        <option value="etc">기타</option>
       </select>
     </div>
     <div id="section__admin"></div>
@@ -37,6 +63,7 @@
 
       let reports = [];
 
+      //METHODS --->
       function transDateStr(string) {
         if (!string) return "-";
         const year = string.substr(0, 4);
@@ -44,11 +71,28 @@
         const date = string.substr(8, 2);
         return `${year}/${month}/${date}`;
       }
-
       function transValue(value, floatNumber) {
         if (!value) return 0;
         return parseFloat(value.toFixed(floatNumber)).toLocaleString("ko-KR");
       }
+      function returnTrGroup(tagName, textArray, reportsIndex) {
+        const headNode = document.createElement("tr");
+        for (let i = 0; i < textArray.length; i++) {
+          const dataNode = document.createElement(tagName);
+          const textNode = document.createTextNode(textArray[i]);
+          dataNode.appendChild(textNode);
+          headNode.appendChild(dataNode);
+        }
+        if (tagName === "td") {
+          const btnNode = document.createElement("input");
+          btnNode.setAttribute("type", "button");
+          btnNode.setAttribute("value", "Delete");
+          btnNode.setAttribute("onclick", `onClick(${reportsIndex})`);
+          headNode.appendChild(btnNode);
+        }
+        return headNode;
+      }
+      // <----- METHODS
       async function onClick(index) {
         const id = reports[index].id;
         const isCorrect = prompt("Enter Something", 0);
@@ -65,19 +109,40 @@
       }
       $selectFilter.addEventListener("change", (event) => {
         const selectValue = event.target.value;
-        console.log(selectValue);
+        window.localStorage.setItem("filterValue", selectValue);
+        document.location.reload();
         // 여기서 중단됨
       });
       async function rendering() {
+        let nextId = 1;
+
+        const selectValue = window.localStorage.getItem("filterValue");
+
         fetch(`${baseUrl}/calculate`, {
           method: "GET",
         })
           .then((response) => response.json())
           .then((json) => {
             reports = json.data;
-            console.log(reports);
-            const containerNode = document.createElement("div");
 
+            const containerNode = document.createElement("table");
+            const headLineNode = returnTrGroup("th", [
+              "",
+              "Comp",
+              "Day",
+              "In",
+              "Out",
+              "Aver",
+              "Twgt",
+              "Feed",
+              "UR",
+              "FE",
+              "PI",
+              "CreatedAt",
+              "UpdatedAt",
+              "Del",
+            ]);
+            containerNode.appendChild(headLineNode);
             for (let i = 0; i < reports.length; i++) {
               const {
                 company,
@@ -93,31 +158,27 @@
                 createdAt,
                 updatedAt,
               } = reports[i];
-              const node = document.createElement("div");
-              const textNode = document.createTextNode(
-                `C:${company},
-                D:${transValue(day, 1)},
-                IN:${inCount}수,
-                OUT:${outCount}수,
-                AW:${transValue(averageWeight, 3)}kg,
-                TW:${transValue(totalWeight, 1)}kg, 
-                FA:${transValue(feedAmount, 2)}kg,
-                UR:${transValue(upbringingRate, 1)}%,
-                FE:${transValue(feedEfficiency, 3)},
-                PI:${transValue(productionIndex, 2)},
-                CR:${transDateStr(createdAt)},
-                UP:${transDateStr(updatedAt)}`
-              );
-              node.appendChild(textNode);
-
-              const btnNode = document.createElement("input");
-              btnNode.setAttribute("type", "button");
-              btnNode.setAttribute("value", "Delete");
-              btnNode.setAttribute("onclick", `onClick(${i})`);
-
-              containerNode.append(node, btnNode);
+              const firstTextArray = [
+                nextId,
+                company,
+                transValue(day, 1),
+                inCount,
+                outCount,
+                transValue(averageWeight, 3),
+                transValue(totalWeight, 1),
+                transValue(feedAmount, 2),
+                transValue(upbringingRate, 1),
+                transValue(feedEfficiency, 3),
+                transValue(productionIndex, 2),
+                transDateStr(createdAt),
+                transDateStr(updatedAt),
+              ];
+              if (company === selectValue || selectValue === "all") {
+                const dataLineNode = returnTrGroup("td", firstTextArray, i);
+                containerNode.appendChild(dataLineNode);
+                nextId += 1;
+              }
             }
-
             $sectionAdmin.append(containerNode);
           })
           .catch((err) => console.error(err));
