@@ -63,7 +63,7 @@
         })
           .then((response) => response.json())
           .then((json) => {
-            const report = json.data[json.data.length - 1];
+            const report = json.data[0];
             const {
               day,
               inCount,
