@@ -63,6 +63,9 @@
       #unique-table th:last-child {
         font-size: 0.8rem;
       }
+      .rankerBtn {
+        /* background-color: red; */
+      }
       input {
         width: 100%;
         padding: 5px 1px;
@@ -117,8 +120,11 @@
       const $sectionReview = document.getElementById("section__review");
       const $sectionResults = document.getElementById("section__results");
 
+      // MAIN METHODS -->
       function onBtnClick(no1RankPartName) {
         const nickname = prompt("명예의 전당에 남길 별명을 적어주세요~");
+        if (nickname.length > 10)
+          return alert("별명은 최대 10글자를 넘길수 없어요~");
         const data = { name: nickname };
         fetch(`${baseUrl}/ranker/${no1RankPartName}`, {
           method: "PUT",
@@ -135,9 +141,9 @@
             );
           })
           .catch(console.error);
-        // ranker 를 이용한 기능구현만 하면됨
       }
 
+      // <-- MAIN METHODS
       async function rendering() {
         fetch(`${baseUrl}/calculate`, {
           method: "GET",
@@ -448,6 +454,7 @@
 
                       const btnNode = document.createElement("input");
                       btnNode.setAttribute("type", "button");
+                      btnNode.setAttribute("class", "rankerBtn");
                       btnNode.setAttribute("value", "별명남기기");
                       btnNode.setAttribute(
                         "onclick",
@@ -487,8 +494,12 @@
                         }
                         const btnNode = document.createElement("input");
                         btnNode.setAttribute("type", "button");
+                        btnNode.setAttribute("class", "rankerBtn");
                         btnNode.setAttribute("value", "별명남기기");
-                        btnNode.setAttribute("onclick", "onBtnClick()");
+                        btnNode.setAttribute(
+                          "onclick",
+                          `onBtnClick('${rankResult.no1[i]}')`
+                        );
 
                         divNode.append(textNode, btnNode);
                         reviewContainerNode.appendChild(divNode);
