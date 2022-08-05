@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Calculator</title>
+    <title>육계사육성적 계산기</title>
     <style>
       body {
         padding: 20px;
@@ -150,6 +150,20 @@
         const outCount = parseFloat(e.target[3].value);
         const totalWeight = parseFloat(e.target[4].value);
         const feedAmount = parseFloat(e.target[5].value);
+
+        if (!company) {
+          return alert("사료회사는 필수항목입니다");
+        } else if (!day) {
+          return alert("사육일수는 필수항목입니다");
+        } else if (!inCount) {
+          return alert("입추수수는 필수항목입니다");
+        } else if (!outCount) {
+          return alert("출하수수는 필수항목입니다");
+        } else if (!totalWeight) {
+          return alert("총중량은 필수항목입니다");
+        } else if (!feedAmount) {
+          return alert("사료량은 필수항목입니다");
+        }
 
         fetch(`${baseUrl}/calculate`, {
           method: "POST",

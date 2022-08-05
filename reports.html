@@ -4,20 +4,77 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Document</title>
+    <title>당신의 성적은?</title>
     <style>
       body {
         font-size: 1.5rem;
       }
       .main-title {
         text-align: center;
-        font-size: 3.5rem;
+        font-size: 3rem;
         margin: 5px 0;
+      }
+      table {
+        width: 100%;
+        border: 1px solid #000;
+        border-collapse: collapse;
+      }
+      th,
+      td {
+        border: 1px solid #000;
+        padding: 8px 4px;
+      }
+      td {
+        font-size: 1.2rem;
+      }
+      tr:first-child {
+        background-color: beige;
+      }
+      td:first-child {
+        background-color: bisque;
+        font-weight: 550;
+      }
+      th:last-child {
+        font-size: 0.8rem;
+      }
+      /* tr:last-child {
+        background-color: #ddd;
+        font-weight: 600;
+      } */
+      #review-title {
+        font-weight: 700;
+        text-align: center;
+      }
+      #unique-table {
+        margin-left: 10px;
+        width: 97%;
+        border: 1px solid #000;
+        border-collapse: collapse;
+        text-align: center;
+        font-size: 0.8rem;
+      }
+      #unique-table td {
+        font-size: 0.8rem;
+      }
+      #unique-table td:first-child {
+        background-color: #fff;
+        font-weight: 400;
+      }
+      #unique-table th:last-child {
+        font-size: 0.8rem;
+      }
+      input {
+        width: 100%;
+        padding: 5px 1px;
+        margin-top: 3px;
       }
       #section__results {
         padding: 20px 10px;
         text-align: center;
         line-height: 2;
+      }
+      #section__review div div {
+        font-size: 0.9rem;
       }
       #toHome {
         width: 11rem;
@@ -43,19 +100,43 @@
   <body>
     <button id="toHome">조회화면으로..</button>
     <div>
-      <h1 class="main-title">Reports Result</h1>
+      <h1 class="main-title">계산이 다 됐어요~ ☺</h1>
     </div>
+    <div id="section__review"></div>
     <div id="section__results"></div>
 
     <script>
+      let reports = [];
+      let ranker = [];
       const baseUrl = "https://ray-calculator.herokuapp.com";
       // const baseUrl = "http://localhost:8080";
       const $toHome = document.getElementById("toHome");
       $toHome.addEventListener("click", () => {
         window.location.href = "index.html";
       });
-
+      const $sectionReview = document.getElementById("section__review");
       const $sectionResults = document.getElementById("section__results");
+
+      function onBtnClick(no1RankPartName) {
+        const nickname = prompt("명예의 전당에 남길 별명을 적어주세요~");
+        const data = { name: nickname };
+        fetch(`${baseUrl}/ranker/${no1RankPartName}`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(data),
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            window.location.reload();
+            return alert(
+              `명예의 전당에 ${data.data.name}(이)라는 이름을 새겼어요!`
+            );
+          })
+          .catch(console.error);
+        // ranker 를 이용한 기능구현만 하면됨
+      }
 
       async function rendering() {
         fetch(`${baseUrl}/calculate`, {
@@ -63,87 +144,362 @@
         })
           .then((response) => response.json())
           .then((json) => {
-            const report = json.data[0];
-            const {
-              day,
-              inCount,
-              outCount,
-              totalWeight,
-              feedAmount,
-              averageWeight,
-              feedEfficiency,
-              productionIndex,
-              upbringingRate,
-            } = report;
+            async function rankerRendering() {
+              fetch(`${baseUrl}/ranker`, {
+                method: "GET",
+              })
+                .then((res) => res.json())
+                .then((js) => {
+                  ranker = js.data;
+                  reports = json.data;
+                  const report = json.data[0];
+                  const {
+                    id,
+                    day,
+                    inCount,
+                    outCount,
+                    totalWeight,
+                    feedAmount,
+                    averageWeight,
+                    feedEfficiency,
+                    productionIndex,
+                    upbringingRate,
+                  } = report;
 
-            const containerNode = document.createElement("div");
+                  const counterNode = document.createElement("div");
+                  const counterTextNode = document.createTextNode(
+                    `(총 ${reports.length}개의 데이터)`
+                  );
+                  counterNode.appendChild(counterTextNode);
+                  $sectionResults.appendChild(counterNode);
 
-            function transValue(value, floatNumber) {
-              return parseFloat(value.toFixed(floatNumber)).toLocaleString(
-                "ko-KR"
-              );
+                  const containerNode = document.createElement("table");
+
+                  // METHODS -->
+                  function transValue(value, floatNumber) {
+                    return parseFloat(
+                      value.toFixed(floatNumber)
+                    ).toLocaleString("ko-KR");
+                  }
+                  function returnTrGroup(tagName, textArray, reportsIndex) {
+                    const headNode = document.createElement("tr");
+                    for (let i = 0; i < textArray.length; i++) {
+                      const dataNode = document.createElement(tagName);
+                      const textNode = document.createTextNode(textArray[i]);
+                      dataNode.appendChild(textNode);
+                      headNode.appendChild(dataNode);
+                    }
+                    if (tagName === "td") {
+                      if (reportsIndex || reportsIndex === 0) {
+                        const btnNode = document.createElement("input");
+                        btnNode.setAttribute("type", "button");
+                        btnNode.setAttribute("value", "Delete");
+                        btnNode.setAttribute(
+                          "onclick",
+                          `onClick(${reportsIndex})`
+                        );
+                        headNode.appendChild(btnNode);
+                      }
+                    }
+                    return headNode;
+                  }
+                  function getRank(key) {
+                    let prodReports = [...reports];
+                    if (key === "day" || key === "feedEfficiency") {
+                      prodReports = prodReports.sort((a, b) =>
+                        a[key] > b[key] ? 1 : -1
+                      );
+                    } else {
+                      prodReports = prodReports.sort((a, b) =>
+                        a[key] > b[key] ? -1 : 1
+                      );
+                    }
+                    const myDataIndexNumber = prodReports.findIndex(
+                      (p) => p.id === id
+                    );
+                    const totalDataCount = prodReports.length;
+                    const rank =
+                      ((myDataIndexNumber + 1) / totalDataCount) * 100;
+                    // console.log(key, myDataIndexNumber + 1, totalDataCount, rank);
+                    if (myDataIndexNumber === 0) {
+                      return "1등";
+                    } else if (myDataIndexNumber === 1) {
+                      return "2등";
+                    } else if (myDataIndexNumber === 2) {
+                      return "3등";
+                    } else {
+                      return `${transValue(rank, 1)} %`;
+                    }
+                  }
+                  function getRankNumber(keyArray) {
+                    let rankArray = [];
+                    let prodReports = [...reports];
+                    for (let i = 0; i < keyArray.length; i++) {
+                      const key = keyArray[i];
+                      if (key === "day" || key === "feedEfficiency") {
+                        prodReports = prodReports.sort((a, b) =>
+                          a[key] > b[key] ? 1 : -1
+                        );
+                      } else {
+                        prodReports = prodReports.sort((a, b) =>
+                          a[key] > b[key] ? -1 : 1
+                        );
+                      }
+                      const myDataIndexNumber = prodReports.findIndex(
+                        (p) => p.id === id
+                      );
+                      rankArray.push({
+                        name: key,
+                        value: myDataIndexNumber + 1,
+                      });
+                    }
+
+                    let feedBackData = {
+                      no1: [],
+                      no2: [],
+                      no3: [],
+                      highest: "",
+                    };
+                    rankArray.sort((a, b) => (a.value > b.value ? 1 : -1));
+                    // console.log(rankArray);
+                    for (let i = 0; i < rankArray.length; i++) {
+                      if (rankArray[i].value === 1) {
+                        feedBackData = {
+                          ...feedBackData,
+                          no1: [...feedBackData.no1, rankArray[i].name],
+                        };
+                      } else if (rankArray[i].value === 2) {
+                        feedBackData = {
+                          ...feedBackData,
+                          no2: [...feedBackData.no2, rankArray[i].name],
+                        };
+                      } else if (rankArray[i].value === 3) {
+                        feedBackData = {
+                          ...feedBackData,
+                          no3: [...feedBackData.no3, rankArray[i].name],
+                        };
+                      } else {
+                        feedBackData = {
+                          ...feedBackData,
+                          highest: rankArray[0].name,
+                        };
+                      }
+                    }
+                    return feedBackData;
+                  }
+                  // <-- METHODS
+                  const headTextArray = ["", "결과", "상위 몇 %일까?"];
+                  const headLineNode = returnTrGroup("th", headTextArray);
+                  const firstTextArray = [
+                    "사육일수",
+                    `${transValue(day, 1)} 일`,
+                    `${getRank("day")}`,
+                  ];
+                  const firstLineNode = returnTrGroup("td", firstTextArray);
+                  const secondTextArray = [
+                    "입추수수",
+                    `${transValue(inCount, 0)} 수`,
+                    "-",
+                  ];
+                  const secondLineNode = returnTrGroup("td", secondTextArray);
+                  const thirdTextArray = [
+                    "출하수수",
+                    `${transValue(outCount, 0)} 수`,
+                    "-",
+                  ];
+                  const thirdLineNode = returnTrGroup("td", thirdTextArray);
+                  const thirdHalfTextArray = [
+                    "폐사수수",
+                    `${transValue(inCount - outCount, 0)} 수`,
+                    "-",
+                  ];
+                  const thirdHalfLineNode = returnTrGroup(
+                    "td",
+                    thirdHalfTextArray
+                  );
+                  const fourthTextArray = [
+                    "평균중량",
+                    `${transValue(averageWeight, 3)} kg`,
+                    `${getRank("averageWeight")}`,
+                  ];
+                  const fourthLineNode = returnTrGroup("td", fourthTextArray);
+                  const fifthTextArray = [
+                    "총 중량",
+                    `${transValue(totalWeight, 1)} kg`,
+                    "-",
+                  ];
+                  const fifthLineNode = returnTrGroup("td", fifthTextArray);
+                  const sixthTextArray = [
+                    "총 사료량",
+                    `${transValue(feedAmount, 2)} kg`,
+                    "-",
+                  ];
+                  const sixthLineNode = returnTrGroup("td", sixthTextArray);
+                  const seventhTextArray = [
+                    "육성율",
+                    `${transValue(upbringingRate, 1)} %`,
+                    `${getRank("upbringingRate")}`,
+                  ];
+                  const seventhLineNode = returnTrGroup("td", seventhTextArray);
+                  const eightthTextArray = [
+                    "사료요구율",
+                    `${transValue(feedEfficiency, 3)}`,
+                    `${getRank("feedEfficiency")}`,
+                  ];
+                  const eightthLineNode = returnTrGroup("td", eightthTextArray);
+                  const ninethTextArray = [
+                    "생산지수",
+                    `${transValue(productionIndex, 2)}`,
+                    `${getRank("productionIndex")}`,
+                  ];
+                  const ninethLineNode = returnTrGroup("td", ninethTextArray);
+
+                  containerNode.append(
+                    headLineNode,
+                    firstLineNode,
+                    secondLineNode,
+                    thirdLineNode,
+                    thirdHalfLineNode,
+                    fourthLineNode,
+                    fifthLineNode,
+                    sixthLineNode,
+                    seventhLineNode,
+                    eightthLineNode,
+                    ninethLineNode
+                  );
+                  $sectionResults.appendChild(containerNode);
+
+                  //REVIEW SECTION
+
+                  const reviewContainerNode = document.createElement("div");
+
+                  const reviewTitleNode = document.createElement("div");
+                  reviewTitleNode.setAttribute("id", "review-title");
+                  const reviewTitleTextNode =
+                    document.createTextNode("✡명예의 전당✡");
+                  reviewTitleNode.appendChild(reviewTitleTextNode);
+                  reviewContainerNode.appendChild(reviewTitleNode);
+
+                  // const test = [
+                  //   { part: "day", name: "Ray" },
+                  //   { part: "averageWeight", name: "Roy" },
+                  //   { part: "upbringingRate", name: "Kim" },
+                  //   { part: "feedEfficiency", name: "Park" },
+                  //   { part: "productionIndex", name: "Jin" },
+                  // ];
+                  const rankTableNode = document.createElement("table");
+                  rankTableNode.setAttribute("id", "unique-table");
+                  const rankHeadTextArray = ranker.map((r) => {
+                    if (r.part === "day") {
+                      return "사육일수";
+                    } else if (r.part === "averageWeight") {
+                      return "평균중량";
+                    } else if (r.part === "feedEfficiency") {
+                      return "사료효율";
+                    } else if (r.part === "productionIndex") {
+                      return "생산지수";
+                    } else {
+                      return "육성율";
+                    }
+                  });
+                  const rankHeadNode = returnTrGroup("th", rankHeadTextArray);
+                  const rankLineTextArray = ranker.map((t) => t.name);
+                  const rankLineNode = returnTrGroup("td", rankLineTextArray);
+
+                  rankTableNode.append(rankHeadNode, rankLineNode);
+                  reviewContainerNode.appendChild(rankTableNode);
+
+                  const rankResult = getRankNumber([
+                    "day",
+                    "averageWeight",
+                    "upbringingRate",
+                    "feedEfficiency",
+                    "productionIndex",
+                  ]);
+                  if (rankResult.no1.length) {
+                    if (rankResult.no1.length === 1) {
+                      const divNode = document.createElement("div");
+                      let textNode;
+                      if (rankResult.no1[0] === "day") {
+                        textNode = document.createTextNode(
+                          `와우!! 사육일수부문에서 최고의 성적입니다! 명예의 전당에 별명을 남기시겠어요?`
+                        );
+                      }
+                      if (rankResult.no1[0] === "averageWeight") {
+                        textNode = document.createTextNode(
+                          `와우!! 평균중량부문에서 최고의 성적입니다! 명예의 전당에 별명을 남기시겠어요?`
+                        );
+                      }
+                      if (rankResult.no1[0] === "upbringingRate") {
+                        textNode = document.createTextNode(
+                          `와우!! 육성율부문에서 최고의 성적입니다! 명예의 전당에 별명을 남기시겠어요?`
+                        );
+                      }
+                      if (rankResult.no1[0] === "feedEfficiency") {
+                        textNode = document.createTextNode(
+                          `와우!! 사료효율부문에서 최고의 성적입니다! 명예의 전당에 별명을 남기시겠어요?`
+                        );
+                      }
+                      if (rankResult.no1[0] === "productionIndex") {
+                        textNode = document.createTextNode(
+                          `와우!! 생산지수부문에서 최고의 성적입니다! 명예의 전당에 별명을 남기시겠어요?`
+                        );
+                      }
+
+                      const btnNode = document.createElement("input");
+                      btnNode.setAttribute("type", "button");
+                      btnNode.setAttribute("value", "별명남기기");
+                      btnNode.setAttribute(
+                        "onclick",
+                        `onBtnClick('${rankResult.no1[0]}')`
+                      );
+
+                      divNode.append(textNode, btnNode);
+                      reviewContainerNode.appendChild(divNode);
+                    } else {
+                      for (let i = 0; i < rankResult.no1.length; i++) {
+                        const divNode = document.createElement("div");
+                        let textNode;
+                        if (rankResult.no1[i] === "day") {
+                          textNode = document.createTextNode(
+                            `와우!! 사육일수부문에서 최고의 성적입니다! 명예의 전당에 별명을 남기시겠어요?`
+                          );
+                        }
+                        if (rankResult.no1[i] === "averageWeight") {
+                          textNode = document.createTextNode(
+                            `와우!! 평균중량부문에서 최고의 성적입니다! 명예의 전당에 별명을 남기시겠어요?`
+                          );
+                        }
+                        if (rankResult.no1[i] === "upbringingRate") {
+                          textNode = document.createTextNode(
+                            `와우!! 육성율부문에서 최고의 성적입니다! 명예의 전당에 별명을 남기시겠어요?`
+                          );
+                        }
+                        if (rankResult.no1[i] === "feedEfficiency") {
+                          textNode = document.createTextNode(
+                            `와우!! 사료효율부문에서 최고의 성적입니다! 명예의 전당에 별명을 남기시겠어요?`
+                          );
+                        }
+                        if (rankResult.no1[i] === "productionIndex") {
+                          textNode = document.createTextNode(
+                            `와우!! 생산지수부문에서 최고의 성적입니다! 명예의 전당에 별명을 남기시겠어요?`
+                          );
+                        }
+                        const btnNode = document.createElement("input");
+                        btnNode.setAttribute("type", "button");
+                        btnNode.setAttribute("value", "별명남기기");
+                        btnNode.setAttribute("onclick", "onBtnClick()");
+
+                        divNode.append(textNode, btnNode);
+                        reviewContainerNode.appendChild(divNode);
+                      }
+                    }
+                    $sectionReview.appendChild(reviewContainerNode);
+                  }
+                })
+                .catch(console.error);
             }
-
-            const node1 = document.createElement("div");
-            const textNode1 = document.createTextNode(
-              `사육일수 :  ${transValue(day, 1)}일`
-            );
-            const node2 = document.createElement("div");
-            const textNode2 = document.createTextNode(
-              `입추수수 :  ${transValue(inCount, 0)}수`
-            );
-            const node3 = document.createElement("div");
-            const textNode3 = document.createTextNode(
-              `출하수수 :  ${transValue(outCount, 0)}수`
-            );
-            const node4 = document.createElement("div");
-            const textNode4 = document.createTextNode(
-              `평균중량 :  ${transValue(averageWeight, 3)}kg`
-            );
-            const node5 = document.createElement("div");
-            const textNode5 = document.createTextNode(
-              `총 중량 :  ${transValue(totalWeight, 1)}kg`
-            );
-            const node6 = document.createElement("div");
-            const textNode6 = document.createTextNode(
-              `총사료량 :  ${transValue(feedAmount, 2)}kg`
-            );
-            const node7 = document.createElement("div");
-            const textNode7 = document.createTextNode(
-              `육성율 :  ${transValue(upbringingRate, 1)}%`
-            );
-            const node8 = document.createElement("div");
-            const textNode8 = document.createTextNode(
-              `사료요구율 :  ${transValue(feedEfficiency, 3)}`
-            );
-            const node9 = document.createElement("div");
-            const textNode9 = document.createTextNode(
-              `생산지수 :  ${transValue(productionIndex, 2)}`
-            );
-
-            node1.appendChild(textNode1);
-            node2.appendChild(textNode2);
-            node3.appendChild(textNode3);
-            node4.appendChild(textNode4);
-            node5.appendChild(textNode5);
-            node6.appendChild(textNode6);
-            node7.appendChild(textNode7);
-            node8.appendChild(textNode8);
-            node9.appendChild(textNode9);
-
-            containerNode.append(
-              node1,
-              node2,
-              node3,
-              node4,
-              node5,
-              node6,
-              node7,
-              node8,
-              node9
-            );
-
-            $sectionResults.appendChild(containerNode);
+            rankerRendering();
           })
           .catch((err) => console.error(err));
       }
