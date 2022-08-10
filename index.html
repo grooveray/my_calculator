@@ -127,6 +127,7 @@
     </div>
     <script>
       const baseUrl = "https://ray-calculator.herokuapp.com";
+
       // const baseUrl = "http://localhost:8080";
 
       const $company = document.getElementById("company");
@@ -179,7 +180,11 @@
             feedAmount,
           }),
         })
-          .then(() => {
+          .then((response) => response.json())
+
+          .then((json) => {
+            const prodResponse = JSON.stringify(json.data);
+            window.localStorage.setItem("createResponse", prodResponse);
             window.location.href = "reports.html";
           })
           .catch((err) => console.error(err));
