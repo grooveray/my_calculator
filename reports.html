@@ -163,7 +163,6 @@
                     window.localStorage.getItem("createResponse");
                   const prodResponse = JSON.parse(createResponse);
                   const report = prodResponse;
-                  window.localStorage.removeItem("createResponse");
                   if (!report) {
                     alert(
                       "올바르지 않은 경로로 접근하였습니다. 페이지를 조회페이지로 강제전환합니다."
